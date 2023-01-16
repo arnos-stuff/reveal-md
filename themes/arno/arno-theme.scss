@@ -1,0 +1,49 @@
+/**
+ * White theme for reveal.js. This is the opposite of the 'black' theme.
+ *
+ * By Hakim El Hattab, http://hakim.se
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@import url(https://cdn.rawgit.com/dreampulse/computer-modern-web-font/master/fonts.css);
+@import url(https://fonts.cdnfonts.com/css/playfair-display);
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: rgba(138, 85, 147, 0.763);
+$backgroundImage: url(../assets/PurpleWave-Dark.png);
+
+$mainColor: rgb(203, 174, 215);
+$heading1Color: rgb(180, 82, 193);
+$heading2Color: rgb(149, 40, 217);
+$heading3Color: rgb(185, 116, 228);
+$heading4Color: rgb(209, 162, 237);
+
+$mainFontSize: 32px;
+$mainFont: "Computer Modern Sans", sans-serif;
+$headingFont: 'Playfair Display', sans-serif;
+$headingTextShadow: none;
+$headingLetterSpacing: normal;
+$headingFontWeight: 600;
+$linkColor: #ff00c8;
+$linkColorHover: lighten( $linkColor, 15% );
+$selectionBackgroundColor: lighten( $linkColor, 25% );
+
+$heading1Size: 2.9em;
+$heading2Size: 1.8em;
+$heading3Size: 1.5em;
+$heading4Size: 1.2em;
+
+// Change text colors against dark slide backgrounds
+@include dark-bg-text-color(#fff);
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------

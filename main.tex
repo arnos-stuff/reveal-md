@@ -1,0 +1,527 @@
+\documentclass[pdftex,11pt,a4paper,oneside]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{example}{Example}[section]
+%\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
+
+%\theoremstyle{plain}
+\newtheorem{definition}{Definition}[section]
+
+\newcommand{\rstr}[2]{\left. #1 \right\rvert_{#2}}
+
+\title{Statistical Properties of Random Dynamical Systems}
+\author{Alexander B}
+\date{January 2021}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Consider an independently distributed sequence $(X_n)_n$ of real-valued, square integrable i.i.d. random variables, each with $\mathrm{E}[X_i] = \mu$ and $\mathrm{Var}[X_i] = v$. The strong law of large numbers tells us that 
+\[\frac{1}{n}X_n\to E[X_n]\]
+almost surely as $n\to\infty$. The central limit theorem tells us that the sequence
+\[S_n^*:= \frac{X_n-\mu}{\sqrt{v}}\]
+converges in distribution to the standard normal distribution. The aim of this paper is to discuss some statistical analogues for random dynamical systems. In contrast to deterministic dynamical systems, random dynamical systems permit the dynamical system to evolve in different ways according to certain probabilities. In particular, I will discuss a very specific model in subsection \ref{subsection:Toy Model} to analyse, with the goal of proving an analogue of the law of large numbers. This paper mostly follows [Kobre \& Young].
+
+
+% We begin with defining a (nonrandom) dynamical system, for which there are several non-equivalent definitions. One such definition is that of a topological dynamical system. 
+% \begin{definition}
+% Consider a Polish space $Y$ equipped with a metric $d$. Let $J= \mathbb{R}_+$ or $J=\mathbb{R}$. A \textbf{topological dynamical system} is a continuous function \[T:J\times\Omega\to \Omega\] such that for all $x\in Y$ and $s,t\in J$ the relations
+% \begin{itemize}
+%     \item $T(0,x) = x$ and 
+%     \item $T(s+t,x) = T(s,T(t,x))$
+% \end{itemize}
+% hold. Note that the above two properties imply that the family of functions $\{ Y\ni x\mapsto T(s,x)\}_{\{s\in I\}}$ form a (semi-) group under composition. If $J = \mathbb{R}_+$ we say that $T$ is \textbf{one-sided}. If $J = \mathbb{R}_+$ we say that $T$ is \textbf{two-sided}. 
+% \end{definition}
+% We could interpret the parameter $s\in J$ as a time and the parameter $x\in Y$ as a point in some phase space. Then the map $s\mapsto T(s,x)$ describes how such a point evolves through time, and the defining properties of $T$ are almost tautological.  
+
+% So far this dynamical system is fully deterministic. Given an initial point $x\in Y$, we know exactly how this point evolves at all times. We will use this as a basis to construct random dynamical systems as follows: Consider a family of dynamical systems $\{T_i\}_{i\in I}$ which represent the various different ways our system might be evolving at any given time. Let $\{q_\theta:Y\mapsto Y\}_{\theta\in \Theta}$ be a collection of 'jumps'. Starting with an initial $x_0\in Y$, we apply a randomly chosen map $T_{i}$ for the duration of some random time $\tau$ and then choose some jump $q_\theta$. Our random dynamical system is then the random variable obtained by iterating this process. 
+
+% In order to put this into more mathematical terms, we first go over some basic definitions. We first define for all indices $i\in I$ and $\theta\in \Theta$ probabilities $p_i:Y\to [0,1]$ and $\tilde{p}_\theta: Y\to [0,1]$, representing the probability of choosing the map $T_i$ and jump $q_i$ respectively. We also define a probability matrix $[p_{ij}]_{i,j\in I}$\footnote{This means the entries lie in $[0,1]$ and each row sums up to unity.}, where $p_{ij}$ determines the probability that the system evolves under $T_j$ if it evolved under $T_i$ during the previous iteration. We denote the ensemble of probability vectors and dynamical systems by $(T,q,p)$. Finally, we define an increasing sequence $\{\tau_n\}_{n\in\mathbb{N}_0}$ of random variables $\tau_n:\Omega\to \mathbb{R}_+$ such that $\tau_0 = 0$ and for all $n\in\mathbb{N}$ the increments $\Delta\tau_n:=\tau_n-\tau_{n-1}$ are i.i.d. In many cases these random times are chosen to be constant. Another case which is often considered is if $\Delta\tau_n$ is exponentially distributed, i.e. with density $g(t) = \lambda e^{-\lambda t},t\geq 0$. In Physics, these exponential distributions appear naturally when considering e.g. spontaneous transitions in energy levels. 
+
+% \begin{definition}
+% Let $x_0\in Y$. Consider sequences $\{\xi_n\}_{n\in \mathbb N}$ and $\{\gamma_n\}_{n\in \mathbb N}$ of random variables $\xi_n:\Omega \to I$ and $\gamma_n:\Omega \to \Theta$, both of which are independent of $\{\tau_n\}_{n\in\mathbb{N}}$ We define the stochastic process $(X(t))_{t\geq 0}$ of $Y$-valued random variables first for the random times $\tau_n, n\geq 1$ inductively by
+% \[X(\tau_n) = x_n:= q_{\gamma_n}\left(T_{\xi_{n-1}}(\Delta\tau_n , x_{n-1})\right).\]
+% We extend this for values of $t\in [\tau_{n-1},\tau_n)$ by setting
+% \[X(\tau_n) =T_{\xi_{n_1}}(t-\tau_{n-1} , x_{n-1}),\quad t\in [\tau_{n-1},\tau_n).\]
+% This does not completely define the stochastic process yet, since there may be events $\omega\in\Omega$ for which 
+% \[\lim_{n\to\infty }\tau_n(\omega) = \sum_{n=1}^\infty \Delta\tau_n<\infty.\]
+% This set is, however, a null set\footnote{This is a relatively straightforward consequence of Kolmogorov's zero-one law.}, so we we may set $X(t)(\omega) = 0$ whenever $t\geq \lim_{n\to\infty }\tau_n(\omega)$ and ignore this edge case from now on. Assume furthermore that our random indices  $\{\xi_n\}_{n\in \mathbb N}$ and $\{\gamma_n\}_{n\in \mathbb N}$ satisfy the relations in the preceding discussion:
+% \begin{equation}\label{equation:randomIndices}
+%     \begin{split}
+%         &P(\xi_0 = i \rvert x_0 = x ) = p(x)\\
+%         &P(\xi_n = j \rvert x_n=x\text{ and } \xi_{n-1}= i) = p_{ij}(x), \text{ and }\\
+%         &P(\gamma_n = \theta \rvert T_{\xi_{n-1}}(\Delta\tau_n,x_{n-1}) = y) = \tilde{p}_\theta(y).
+%     \end{split}
+% \end{equation}
+% \[\gamma_n = M_1(x_{n-1},\xi_{n-1},\Delta\tau)\]
+% We say that $X(t)$ is a \textbf{random dynamical system}. Let us also note that $\gamma$
+% \end{definition}
+
+% Consider the product space $Y\times \mathbb{N}$. We claim that the process $(x_n,\xi_n)$ is Markov with respect to the filtration induced by $(x_n,\xi_n)_{n\in\mathbb{N}_0}$. We note that the pair $(x_n,\xi_n)$ depends only the pair $(x_{n-1},\xi_{n-1})$ and the random variable $(\gamma_n,\Delta\tau_n)$. Indeed, we have that
+% \begin{equation}
+%     \begin{split}
+%         & x_n = f_n((x_{n-1},\xi_{n-1}),(\gamma_n,\Delta \tau_n)),\text{ where }\\
+%         &f:\left(Y\times\mathbb{N}\right)\times(\mathbb{N}\times\mathbb{R}_+) \to Y: ((x,\xi),(\gamma,r))\mapsto q_{\gamma}(T_\xi(r,x))
+%     \end{split}
+% \end{equation}
+% is measureable. For any measurable sets $A_0,\ldots,A_n\subset \Omega$ and any numbers $b_0,\ldots,b_n\in \mathbb{N}$ we have that 
+% \begin{equation}
+%     \begin{split}
+%         P\Big((x_n,\xi_n) \in A_n\times \{b_n\}\Big|& (x_0,\xi_0) = A_0\times \{b_0\}, \\&\cdots,(x_{n-1},\xi_{n-1}) A_{n-1}\times \{b_{n-1}\} \Big)\\
+%          = P\Big((x_n,\xi_n) \in A_n\times \{b_n\}&\Big|(x_{n-1},\xi_{n-1}) \in A_{n-1}\times \{b_{n-1}\} \Big)
+%     \end{split}
+% \end{equation}
+% This shows us that 
+% For $\tau_{n-1}\leq t < \tau_n$ we see that $X(t)$ depends on both $x_{n-1}$ and $\xi_{n-1}$
+
+\section{Deterministic local dynamics}
+\subsection{Definition of a random map}
+\begin{definition}
+Let $\Sigma$ be a metric space equipped with its Borel measure, and let $\mathcal{F}$ be a finite family of continuous maps. We equip $\mathcal{F}$ with a probability measure defined by $P$. We call the pair $(\mathcal{F},P)$ a \textbf{random maps system}. For an infinite sequence $(f_i)_{i\in\mathbb{Z}^+}$ we define the composition 
+\[f^{(n)}= f_{n-1}\circ\cdots f_{1}\circ f_0.\]
+\end{definition}
+
+\subsection{Toy Model}\label{subsection:Toy Model}
+We consider a toy model which represents a particle on a homogeneous lattice with random jumps at each site. As long as it remains on this particular site, we assume that the dynamics are deterministic. We represent the lattice by $\mathbb{Z}$ and let the dynamics at each site happen on the circle $\mathbb{S}^1$. In other words, our phase space is given by $\mathbb{Z}\times \mathbb{S}^1$. Let $T:\mathbb{S}^1\to\mathbb{S}^2$ be a $C^2$ uniformly expanding map on the circle, i.e. $T$ is twice continuously differentiable and its derivative satisfies
+\[|T'(x)|> 1 \]
+for all $x\in\mathbb{S}^1$. We define two intervals $U_l,U_r\subset \mathbb{S}^1$, and two \textbf{jump maps} $\phi_l:U_l\to \mathbb{S}^1$ and $\phi_r:U_r\to \mathbb{S}^1$ such that $\phi_l,\phi_r$ are $C^2$ embeddings. Additionally, we assume there is some $\lambda_0>1$ such that 
+\[|\phi'_l(x)|,|\phi'_l(x)|> \lambda_0\]
+for all $x\in \mathbb{S}^1$.
+
+Consider a particle $(i,x)\in \mathbb{Z}\times \mathbb{S}^1$. We define the Markov chain $\left((X_k,Y_k)\right)_{k\in\mathbb{Z}^+}$ as follows. If $(X_k,Y_k) = (i,x)$, then 
+\[(X_{k+1},Y_{k+1}) = (i,\tau(x)) \text{ if } \tau(x)\in \mathbb{S}^1\setminus\left(U_l\cup U_r\right).\]
+If $\tau(x)$ lies in the jump interval $ U_l$, there is a probability $p_l\in [0,1]$ such that
+\begin{equation}
+    \begin{split}
+        P\Big((X_{k+1},Y_{k+1}) &= (i-1,\phi_l(\tau(x)))\Big| \tau(x)\in U_l\Big) = p_l\\
+        P\Big((X_{k+1},Y_{k+1}) &= (i,\tau(x))\Big| \tau(x)\in U_l\Big) = 1-p_l
+    \end{split}
+\end{equation}
+In other words: if the particle ends up in $U_l$ jumps to the left with probability $p_l$. Analogously, we assume that if $\tau(x)\in U_r$, the particle jumps to the point $(X_{k+1},Y_{k+1}) =(i+1,\phi_r(\tau(x)))$ with probability $p_r\in [0,1]$, and remains at $(X_{k+1},Y_{k+1}) =(i,\tau(x))$ in the other case. We shall show in the next subsection how we encode this information as a random maps system.
+
+
+\subsection{A Reformulation of the Model}\label{section:A Reformulation}
+We use the same notation as in the previous subsection. We note that $(Y_k)$ is a markov chain, as the transition probabilities $p_l$ and $p_r$ are constant, and hence independent of $x\in Y$. We can get rid of the jumping steps by incorporating them into $\tau$. First, we modify $\mathbb{S}^1$ by defining $\mathbf{S} = \mathbb{S}^1 \cup I_l \cup I_r$, where $I_l$ and $I_r$ are intervals with surjective isometries $\iota_l:U_l\to I_l$ and $\iota_r: U_r\to I_r$. We also assume that the union defining $\mathbf{S}$ is disjoint. We define the map isometry $\tilde{\phi}_l: I_l\to \mathbb{S}^1$ such that $\phi_l = \tilde{\phi}_l\circ \iota_l$, and define $\tilde{\phi}_r:I_r\to \mathbb{S}^1$ analogously. The purpose of the so-called \textbf{holding intervals} $I_l$ and $I_r$ is to be an intermediate step each time a jump occurs. We define the maps $T_{o},T_l,T_r,T_{lr}:\mathbf{S}\to\mathbf{S}$ as follows. For any $T \in \{T_{o},T_l,T_r,T_{lr}\}$ we define
+\begin{subequations}\label{equation:HalfOfOmega}
+    \begin{align}
+        &T_l(x) = T_{lr}(x) = \iota_l(\tau(x)) \text{ if } x\in\tau^{-1}U_l \label{subeq:left transitions},\\
+        &T_r(x) = T_{lr}(x) = \iota_r(\tau(x)) \text{ if } x\in\tau^{-1}U_r \label{subeq:right transitions}\text{, and}\\
+        &T(x) = \tau(x) \text{ if } x\in\mathbb{S}^1 \text{ and $T(x)$ is not covered above}.
+    \end{align}
+\end{subequations}
+
+If $x$ belongs to the holding interval, then 
+\begin{equation}\label{equation:secondHalfOfOmega}
+     T(x) = T(\tilde{\phi_l}(x)) \text{ if } x\in I_l \text{ and }
+        T(x) =  T(\tilde{\phi_r}(x)) x\in I_r,
+\end{equation}
+where we use the values of $T$ already defined in \eqref{equation:HalfOfOmega}. Let us define the set $\mathcal{T} = \{T_{o},T_l,T_r,T_{lr}\}$ and turn it into a probability space $(\mathcal{T},P)$ by setting
+\begin{equation}\label{eq:FourProbabilities}
+    \begin{split}
+        &P(T_{o}) =(1-p_l)(1-p_r),\enskip P(T_l) = p_l(1-p_r),\\
+        &P(T_r) = p_r(1-p_l), \text{ and } \enskip P(T_{lr}) = p_lp_r.
+    \end{split}
+\end{equation}
+%We define for $n\in\mathbb{Z}^+$ the random variable $T^{(n)}$ defined by taking taking an i.i.d. sequence $(T_1,T_2,\ldots ) \in (\mathcal{T},P)$ and letting
+%\[T^{(n)}(x) = \left(T_{n-1}\circ \cdots T_1\circ T_0\right)(x)\] 
+%for $x\in \mathbf{S}$. We define  $\mathbf{T}$ by
+%\[\mathbf{T} =  (\mathcal{T},P,\{T^{(n)}\}_{n\in\mathbb{Z}^+}),\]
+Hence we define the random maps system
+\[\mathbf{T} =  (\mathcal{T},P),\]
+%Note that such a system is a special kind of random dynamical system. 
+For any point $x_0\in \mathbf{S}$ and $i_0\in\mathbb{Z}^+$, we use $\mathbf{T}$ to define a Markov chain $\left((\tilde{X}_k,\tilde{Y}_k)\right)_{k\in\mathbb{Z}^+}$ in the phase space $\mathbb{Z}\times\mathbf{S}$ as follows. Define $(\tilde{X}_0,\tilde{Y}_0) = (i_0,x_0)$. Then for each $n\in\mathbb{N}$ we inductively define $(\tilde{X}_n,\tilde{Y}_n)$ by setting $\tilde{Y}_n = T_{n-1}\left(x\right)$, where $x=\tilde{Y}_{n-1}$. We  set $\tilde{X}_n = \tilde{X}_n - 1$ if $x\in I_l$ and $\tilde{X}_{n-1} = \tilde{X}_n - 1$ if $x\in I_r$. In other words, we keep track of the lattice point by counting the number of times $(\tilde{Y}_n)_n$ visits each holding interval. The Markov chain $\left((\tilde{X}_k,\tilde{Y}_k)\right)_{k\in\mathbb{Z}^+}$ has the following properties which follow immediately from \eqref{equation:HalfOfOmega},  \eqref{equation:secondHalfOfOmega} and \eqref{eq:FourProbabilities}. Let $(\tilde{X}_n,\tilde{Y}_n) = (i,x)$;
+\begin{itemize}
+    \item if $x\in \tau^{-1}(U_l)$, then $\tilde{Y}_{n+1} \in I_l$ with probability $p_l$,
+    \item and if $x\in \tau^{-1}(U_r)$, then $\tilde{Y}_{n+1} \in I_r$ with probability $p_r$.
+\end{itemize}
+We therefore obtain the Markov chain in Subsection \ref{subsection:Toy Model} on the phase space $\mathbb{Z}\times \mathbb{S}^1$ by projecting $\tilde{Y_k}$ back down to $\mathbb{S}^1$ whenever $\tilde{Y_k}\in I_l,I_r$, and delaying changes in the $X$-coordinate by one step.
+%Conversely, from the Markov chain in Subsection \ref{subsection:Toy Model} we can obtain the Markov chain $(\tilde{X}_n,\tilde{Y}_n) $ by adding an intermediate step to a holding interval at each jump. 
+Our claim that $\mathbf{T}$ represents the Markov chain is then proven. 
+
+\subsection{Transfer operators and invariant measures}
+We start with two definitions that we will use often.
+\begin{definition}\label{def:Invariant Measures}
+Let $\Sigma$ be a metric space equipped with its Borel measure, and let $\mathbf{F}$ be a random map system defined by measureable maps $\mathcal{F}:=\{f_i:\Sigma\to\Sigma\}_{i=1}^n$ and probabilities $P(f_i) = p_i$. Then we say that \textbf{a probability measure $\mu$ on $\Sigma$ is an invariant measure of $\mathbf{F}$ } if for all Borel subsets $E\subset \Sigma$ we have that 
+\begin{equation}\label{eq:defOfInvariance}
+    \mu(E) = \sum_{i=1}^n p_i\mu\left(f_i^{-1}(E)\right).
+\end{equation}
+More compactly, we write
+\[\mu = \sum_{i=1}^n p_i ({f_i}_*\mu),\]
+where ${f_i}_*\mu$ denotes the \textbf{pushforward measure of } $\mu$ under $f_i$. 
+\end{definition}
+The following lemma is trivial but convenient. 
+\begin{lemma}\label{lemma:MeasuresUnderMaps}
+    Let $\mu$ be an invariant measure of a random maps system $(\mathcal{F},P)$ defined on a metric space $\Sigma$. Then any Borel set $E\subset \Sigma$ satisfies
+    \[\mu(E)>a \implies \mu(f(E)) > P(f)a\]
+    for $a>0$ and any $f\in\mathcal{F}$.
+\end{lemma}
+\begin{proof}
+This follows from replacing $E$ with $f(E)$ in \eqref{eq:defOfInvariance} and using the set-theoretic identity $f^{-1}(f(E))\supset E$. 
+\end{proof}
+\begin{definition}
+We use the notation of Definition \ref{def:Invariant Measures} and furthermore assume $p_i>0$ for all $i$. We say that $\mu$ is \textbf{ergodic} if there exists no Borel set $E$ for which $0<\mu(E)<1$ and for which 
+\[f_i^{-1}(E) = E \enskip \mu-\text{almost everywhere}\]
+for all $i$. 
+\end{definition}
+
+We briefly explore the link between these random maps and deterministic ergodic theory, which will be helpful in determining the statistical properties of our model. Suppose we have a random maps system $\mathbf{F}=(\mathcal{F},P)$, where $\mathcal{F}$ is a finite collection of continuous maps on a measure space $\Sigma$. We define a new probability space 
+\[\mathbf{F}^{\mathbb{N}}:=(\mathcal{F}^{\mathbb{N}},P^{\mathbb{N}}),\]
+where 
+\[\mathcal{F}^{\mathbb{N}} = \left\{\underline{f} = (f_n)_{n\in\mathbb{Z}^+}: f_n\in \mathcal{F} \text{ for all } n\in\mathbb{Z}^+\right\}\]
+and $P^{\mathbb{N}}$ is the product measure on $\mathcal{F}^{\mathbb{N}}$ generated by $P$\footnote{Since $P$ is a Borel measure on a discrete space, we run into no difficulty with the Kolmogorov extension theorem}. We equip the finite set $\mathcal{F}$ with the discrete topology and $\mathcal{F}^{\mathbb{N}}$ with the product topology, which turns $\mathcal{F}^{\mathbb{N}}$ into a compact metrizable space. We let $\sigma$ be the Bernouilli shift map 
+\[\sigma:\mathcal{F}^{\mathbb{N}}\to \mathcal{F}^{\mathbb{N}}: (f_0,f_1,\ldots) \mapsto (f_1,f_2,\ldots).\]
+We then encode the random maps system by the skew-product 
+\[\hat{F}:\mathcal{F}^{\mathbb{N}}\times \Sigma: (\underline{f} , x) \mapsto (\sigma(\underline{f}) , f_0 (x)).\]
+Furthermore, if $\mu$ is a Borel measure on $\sigma$, we define the corresponding measure 
+\[\hat{\mu}:=P^{\mathbb{N}}\times\mu\]
+on $\mathcal{F}^{\mathbb{N}}\times \Sigma$.
+\begin{lemma}\label{lemma:ConversionToDeterminism}
+    Let $\mathbf{F}=(\mathcal{F},P)$ and $\mu$ be random maps sytem and a Borel measure on $\Sigma$, respectively. Let $ \hat{\mu}=P^{\mathbb{N}}\times\mu$. Then $\mu$ is an invariant measure of $\mathbf{F}$ if and only if $\hat{\mu}$ is invariant under $\hat{F}:(\underline{f} , x) \mapsto (\sigma(\underline{f}) , f_0 (x))$. Similarly $\mu$ is ergodic if and only if $\hat{\mu}$ is.
+\end{lemma}
+\begin{proof}
+Let $E$ a Borel set of $\Sigma$ and let $A\subset \mathcal{F}^{\mathbb{N}}$. Using the product rule for product measures we have that
+% We define for any $f\in \mathcal{F}$ and $i\in\mathbb{N}$ the cylinder set 
+% \[e_i(f) := \{(f_n)_n \in\mathcal{F}^\infty: f_i = f\}.\]
+% We make a case distinction. If $i\geq 1$, then  
+\begin{equation}
+    \begin{split}
+            \hat{\mu}\left(\hat{F}^{-1}(A\times E)\right) &= \hat{\mu}\left(\bigcup_{f\in\mathcal{F}}\left((\{f\}\times A) \times f^{-1}(E)\right)\right) \\
+    &=P^{\mathbb{N}}(A)\sum_{f\in A} P(f)\mu(f^{-1}(A))
+    \end{split}
+\end{equation}
+If $\mu$ is an invariant measure of $\mathbf{F}$, then last expression above is equal to $P^{\mathbb{N}}(A)\mu(A)$ and hence equal to $\hat{\mu}(A\times E)$. Conversely if $\hat{\mu}$ were invariant then the first expression in the above equation would be equal to $P^{\mathbb{N}}(A)\times \mu(E)$. Since sets of the form $A\times E$ generate the product sigma algebra of the measure space $\mathcal{F}^{\mathbb{N}}\times \Sigma$, we have proven the claim on invariance.
+
+Proving equivalence of ergodicity is very similar. Again, let $E$  be a Borel set of $\Sigma$ and let $A\subset \mathcal{F}^{\mathbb{N}}$. Then 
+\[\hat{F}^{-1}(A\times E) = \bigcup_{f\in\mathcal{F}}\left((\{f\}\times A) \times f^{-1}(E)\right)\]
+Assume for the moment that $\mu$ is not ergodic. Then there exists a set $E$ with $0<\mu(E)<1$ such that $f^{-1}E = E$ modulo a null set. Then the above formula for $A=\mathcal{F}^\infty $ shows that $\hat{\mu}$ is not ergodic as well. 
+
+The other implication is slightly more technical. We refer to Theorem 2.1 in [Kifer Y.].
+%Let $\hat{E}$ be a $\hat{\mu}$-invariant borel set of $\mathcal{T}^{\mathbb{N}}\times \Sigma$ of positive $\hat{\mu}$-measure. We have by invariance of $\mu$ that
+%modulo sets of $\mu$-measure zero. If the left hand side were equal to zero, then 
+\end{proof}
+
+\begin{theorem}[Ergodic Theorem for Random maps]\label{theorem:ErgodicTheorem}
+We use the notation in the previous lemma. Assume that the measure $\mu$ is ergodic. Let $g\in L^1_\mu(X)$. Then for $P^\mathbb{N}$-almost every sequence $(\underline{f})\in \mathcal{F}^\mathbb{N}$ we have that 
+\[\lim_{n\to\infty} \frac{1}{n}\sum_{k=0}^n g\circ f^{(n)} = \int gd\mu,\]
+where we recall that $f^{(n)} =f_{n-1}\circ\cdots\circ f_0 $.
+\end{theorem}
+\begin{proof}
+Consider a $\hat{\mu}$-integrable function $\hat{g}:P^\mathbb{N}\times \Sigma$. We define the time average $\hat{g}_{time}:P^\mathbb{N}\times \Sigma\to P^\mathbb{N}\times \Sigma$ by
+\[\hat{g}_{time} :=\lim_{n\to\infty} \frac{1}{n}\sum_{k=0}^n \hat{g}\circ\hat{F}^{(k)} = .\]
+We define the space average by 
+\[\hat{g}_{space} := \int \hat{g}d\hat{\mu}.\]
+
+The ergodic theorem for deterministic dynamical systems tells us that $\hat{g}_{time}(\underline{f},x) = \hat{g}_{space}$ for $\hat{\mu}$-almost everywhere. The lemma follows by taking $\hat{g}(\underline{f},x) = g(x)$. 
+\end{proof}
+
+
+Key to our analysis is a so-called transfer operator. The goal is to use this Ergodic theorem to talk about some statistical properties our random maps system. In order to do that, we must first find our invariant ergodic measure $\mu$. Key to our analysis are so-called transfer operators.
+
+\begin{definition}
+Using the notation above and using the labeling $\mathcal{F}:=\{f_i:\Sigma\to\Sigma\}_{i=1}^n$, assume that there exists some $\sigma$-finite Borel measure $m$ on $\Sigma$ such that ${f_i}_*\mu$ is absolutely continuous with respect to $m$ for all $i$. We then define the \textbf{transfer operator $\mathcal{L}_{f_i}$ associated to $f_i$} as follows. Let $\phi$ be an element of the set of all $m$-integrable functions $L^1_m(\Sigma)$. Define the measure $\nu_\phi$ for all Borel sets $E\subset\Sigma$ by
+\[\nu_\phi(A) =\int_A \phi dm.\]
+Then 
+\begin{equation}\label{equation:TransferOperator}
+    \mathcal{L}_{f_i}(\phi) = \frac{d{f_i}_*\nu_\phi}{dm},
+\end{equation}
+where $\frac{d{f_i}_*\nu_\phi}{dm}$ is the Radon-Nikodym derivative of ${f_i}_*\nu_\phi$ with respect to $m$. We define then the \textbf{transfer operator for the random map system $\mathbf{F}$} by setting
+\[\mathcal{L}_{\mathbf{F}} = \sum_{i=1}^k p_i \mathcal{L}_{f_i}.\]
+\end{definition}
+\begin{remark}
+We note that if $\mathcal{L}_{f_i}(\phi) = \phi$, then any Borel set $E$ satisfies  
+\begin{equation}\label{eq:RemarkOnTransferOperator}
+    \int_E \phi dm=\int_E\mathcal{L}_f(\phi) dm =\int_E d(f_*\nu_\phi)
+\end{equation}
+and hence $f_*\nu_\phi =\nu_\phi$. The converse is also true by unicity of the Radon Nikodym derivative. Hence the condition $\mathcal{L}_{f_i}(\phi) = \phi$ is equivalent to $\nu_\phi$ being an invariant measure with respect to $f$.
+\end{remark}
+We study the transfer operator for $\Sigma = [0,1]$ and $m$ the lebesgue measure. The generalisation to $\Sigma = \mathbf{S}$ will be rather short. Fix some $i$ and denote $f=f_i:[0,1]\to [0,1]$ for simplicity. Equation \eqref{equation:TransferOperator} implies for any $\phi \in L^1_m([0,1])$ that 
+\begin{equation}\label{equation:UnpackingCurlyLambda}
+    \int_{[0,x]}\mathcal{L}_f(\phi) dm = \int_{[0,x]}d(f_*\nu_\phi)   = \int_{f^{-1}([0,x])}d\nu_\phi = \int_{f^{-1}([0,x])} \phi dm .
+\end{equation}
+Applying the Lebesgue differentiation theorem on the leftmost and rightmost side of the equation we have that
+\begin{equation}\label{equation:explicitFormulaForTransferOperator}
+    \mathcal{L}_f(\phi) = \frac{d}{d x}\int_{f^{-1}([0,x])} \phi dm 
+\end{equation}
+$m$-almost everywhere, where the theorem also states that the right hand side is defined almost everywhere. It follows from  elementary properties of the Radon-Nikodym derivative that $\mathcal{L}_f$ is linear and positive, i.e. $\mathcal{L}_f(\phi) >0$ if $\phi>0$.
+By inserting $x=1$ in \eqref{equation:UnpackingCurlyLambda} we obtain that
+\begin{equation}\label{eq:TransferOPPreservesIntegrals}
+    \int_{[0,1]} \mathcal{L}_f(\phi) dm = \int_{[0,1]} \phi dm,
+\end{equation}
+and hence $\mathcal{L}_f$ preserves integrals. Applying the above first to positive functions $\phi>0$ and then using linearity, we also have that $\mathcal{L}_f$ is continuous with $||\mathcal{L}_f(\phi)|| = ||\phi||$ for all $\phi \in L^1_m([0,1])$. For any Borel set $E\subset [0,1]$ we have for any $g\in\mathcal{F}$ that
+\[\int_E \left(\mathcal{L}_{f}\circ \mathcal{L}_{g}\right)(\phi) dm = \int_{f^{-1}(E)} \mathcal{L}_g(\phi) dm = \int_{g^{-1}(f^{-1}(E))} \phi dm .\]
+The rightmost side of this equation can be further shown to satisfy
+\[\int_{g^{-1}(f^{-1}(E))} \phi dm = \int_{g^{-1}(f^{-1}(E))} d\nu_\phi = \left((f\circ g)_*\nu\right)(E),\]
+which shows that 
+\[(\mathcal{L}_f\circ\mathcal{L}_g)(\phi) = \frac{d(f\circ g)_*\nu_{\phi}}{dm}=\mathcal{L}_{f\circ g}.\]
+for all $\phi$, and hence we have that $\mathcal{L}_f\circ\mathcal{L}_g=\mathcal{L}_{f\circ g}$.
+In particular we have for any $n\in\mathbb{N}$ that $\left(\mathcal{L}_{f}\right)^n = \mathcal{L}_{f^n}$.
+
+\begin{definition}
+Recall that for a function $g:[a,b]\to\mathbb{R}$ we define the \textbf{total variation} $\bigvee g$ to be equal to 
+\[\bigvee g = \sup\left\{ \sum_{i=0}^{l-1} |g(b_{i+1})-g(b_i)|: a=b_0<b_1<\ldots<b_l =b, l\in\mathbb{N} \right\}.\]
+For a subinterval $[x,y]\subset [a,b]$ we define $\bigvee_x^y g$ to be equal to $\bigvee \rstr{g}{[x,y]}$, where $\rstr{g}{[x,y]}$ is the function $g$ restricted to the subinterval. For any set $E$ we similarly define $\bigvee_E g:= \rstr{g}{E}$. Similarly, for $g:\mathbb{S}^1\to \mathbb{R}$ we write that 
+\[\sup\left\{ \sum_{i=0}^{l-1} |g(b_{i+1})-g(b_i)|: b_0<b_1<\ldots<b_l =b_0, l\in\mathbb{N} \right\},\]
+where by $a<b<c$ we mean that $a,b,c\in \mathbb{S}^1$ follow each other in an anticlockwise fashion.
+
+If $g$ is defined on some finite disjoint union $A_1,A_2,\ldots,A_q$ of circles and intervals, we then define $\bigvee g = \sum_{i=1}^q \bigvee \rstr{g}{A_i}$. 
+\end{definition} 
+ 
+
+
+We assume that the finite collection $\mathcal{F} $ of real-valued functions on $[0,1]$ satisfy the following properties. Let $f\in\mathcal{F}$. We first assume that $f$ is a piecewise $C^2$ function. With this we mean that there is some $l\in\mathbb{N}$ and a partition $0=a_0<a_1<\cdots<a_l = 1$ for which $f$ is twice continuously differentiable on $(a_i,a_i+1)$ for all integers $0\leq i<n$. We also assume that $\rstr{f}{(a_i,a_{i+1})}$ may be extended to a $C^2$ function on $[a_i,a_{i+1}]$ for all $i$. We also assume that $f'>1$ wherever the derivative is defined. We do not assume that $f$ is continuous at the partition points $a_i$.
+\begin{lemma}\label{lemma:L-Y}
+    Under the conditions laid out above, there exists a positive integer $N$ together with constants $C>0$ and $0<c<1$ such that for any integer $n\geq N$ and any $\phi \in L^1_m([0,1])$ with bounded variation the following holds. Let  $\tilde{f}_1,\ldots,\tilde{f}_n\in \mathcal{F}$\footnote{I add these tildes to avoid confusion when we assume that the elements in $\mathcal{F}$ are already numbered some way.}. Then
+    \begin{equation}\label{eq:BoundedVariationOfTransferOperator}
+        \bigvee \left(\mathcal{L}_{\tilde{f}_1}\circ\cdots\circ\mathcal{L}_{\tilde{f}_n}\right) (\phi) \leq c\bigvee \phi + C||\phi||_1.
+    \end{equation}
+\end{lemma}
+\begin{remark}
+    The statement of the lemma is not very precise. Indeed, the operator $\mathcal{L}_{\tilde{f}_1}\circ\cdots\circ\mathcal{L}_{\tilde{f}_n}$ is only defined as an operator on $L^1_m([0,1])$, the elements of which are actually equivalence classes of measureable functions modulo changes in sets of measure zero. However, the total variation does not remain constant under such changes of measure zero. More precisely we are saying that there exists an element in the equivalence class of $ \left(\mathcal{L}_{\tilde{f}_1}\circ\cdots\circ\mathcal{L}_{\tilde{f}_n}\right) (\phi)$ for which the lemma holds.  
+\end{remark}
+\begin{proof}
+We calculate $\left(\mathcal{L}_{\tilde{f}_1}\circ\cdots\circ\mathcal{L}_{\tilde{f}_n}\right)\phi$ at almost all points. Let \[s = \inf \left\{|\tilde{f}_i'(x)|: x\in [0,1], i\in\{1,\ldots,N\} \right\},\] let $N$ be a positive integer such that $s^{-N}>2$ and let $n\geq N$. For ease of notation write $g = \tilde{f}_1\circ\cdots\circ \tilde{f}_n$. The assumption that $|\tilde{f}_i'|>1$ for all $i$ implies in particular that $\tilde{f}_i$ is piecewise monotone for all $i$. It follows that $g$ is piecewise $C^2$. Let $0 = b_0<\cdots <b_l=1$ be the partition corresponding to $g$ and denote let $g_i:[b_{i-1},b_i]$ be the unique extension of the function $ \rstr{g}{(b_{i-1},b_i)}$
+for all $i\in\{1,\ldots,l\}$. By our assumption $g_i$ is $C^2$ and by the definition of $s$ satisfies 
+\begin{equation}\label{equation:strongExpansion}
+    |g_i'|\geq s^N\geq 2
+\end{equation}
+except on a finite number of partition points. From \eqref{equation:explicitFormulaForTransferOperator} we obtain for any $\phi \in $
+\begin{equation}\label{equation:derivingIntPhi}
+    \mathcal{L}_g(\phi) = \frac{d}{d x}\int_{g^{-1}([0,x])} \phi dm =\frac{d}{d x}\sum_{i=1}^l\int_{g^{-1}([0,x])\cap [b_{i-1},b_i]} \phi dm.
+\end{equation}
+We note that $g^{-1}([0,x])\cap [b_{i-1},b_i] = g_i^{-1}([0,x])$. We know that $g_i$ is $C^2$ and strictly monotone. Assume for the moment that $g_i$ is strictly increasing. Then the image of $g_i$ is the interval $[g(b_{i-1}),g(b_i)]\subset [0,1]$, and hence 
+\[g_i^{-1}([0,x]) = \begin{cases}
+                    \emptyset & \text{if } x<g(b_{i-1})\\
+                    [b_{i-1},g^{-1}(x)] & \text{if } g(b_{i-1})<x<g(b_i)\\
+                    [0,1] &\text{if } g(b_i)<x.
+                    
+                                \end{cases}\]
+If we denote the function $g_i^{-1}$ by $h_i$, we obtain by the Leibniz integral rule that 
+\begin{equation}\label{equation:}
+    \frac{d}{dx} \int_{g_i^{-1}([0,x])} \phi dm = \chi_i\phi(h_i(x))|h_i'(x)| ,
+\end{equation}
+where $\chi_i$ is the indicator function on the interval $g([b_{i-1},b_i])$ and $|h_i'(x)| = h_i'(x)$ since $g$ is strictly increasing. The calculation for the case that $g$ is strictly decreasing is completely analogous, hence inserting the above into \eqref{equation:derivingIntPhi} we have
+\begin{equation}\label{equation:ExplicitFrobenius}
+    \left(\mathcal{L}_g(\phi)\right)(x)= \sum_{i=1}^l \chi_i(x)\phi(h_i(x))|h_i'(x)| ,
+\end{equation}
+The above function shows us that we can extend the operator $\mathcal{L}_g$ to an operator for all real-valued functions on $[0,1]$. By \eqref{equation:strongExpansion} we have that $|h_i'(x)|\leq s^{-N}$ for all $i$ and $x\in g([b_{i-1},b_i])$. This property combined with \eqref{equation:ExplicitFrobenius} and the definition of bounded variation we obtain that if $\phi$ has bounded variation, then
+\begin{equation}\label{eq:FirstStepInCalculatingTheVariation}
+    \bigvee \left(\mathcal{L}_g(\phi)\right) \leq \sum_{i=1}^l\bigvee_{g([b_{i-1},b_i])}\left\{ (\phi\circ h_i)|h_i'|\right\}+s^{-N}\sum_{i=1}^l(|\phi(b_{i-1})|+|\phi(b_i)|).
+\end{equation}
+The second term on the right is to account for discontinuities due to the characteristic functions $\chi_i$. Let $\epsilon >0$ and let $b_{i-1}=a_1<a_2<\cdots<a_m = b_i$ be a partition such that 
+\begin{equation}\label{eq:SplittingTheTotalVariation}
+    \begin{split}
+        &\bigvee_{g([b_{i-1},b_i])}\left\{ (\phi\circ h_i)|h_i'|\right\} \\
+         &<\sum_{j=0}^{m-1} \Big|(\phi\circ h_i)(a_j)|h_i'(a_j)|-(\phi\circ h_i)(a_{j-1})|h_i'(a_{j-1})|\Big|+\epsilon\\
+        &\leq\sum_{j=0}^{m-1} \Big|(\phi\circ h_i)(a_j)-(\phi\circ h_i)(a_{j-1}) \Big||h_i'(a_{j})|\\
+        &+\sum_{j=0}^{m-1}|(\phi\circ h_i)(a_{j-1})|\Big| h_i'(a_{j}) -h_i'(a_{j-1})\Big|+\epsilon,
+    \end{split}
+\end{equation}
+
+where the last inequality is obtained from the triangle inequality. We note that since $g_i$ is expanding and twice continuously differentiable, the second derivative $h_i''$ exists and is continuous. By the mean value theorem we obtain that 
+\[ |h_i'(a_{j}) -h_i'(a_{j-1})| =  |h''(c_j)|(a_{j}-a_{j-1})\]
+for some $c_j\in [a_{j-1},a_j]$. Combined with the fact that $|h'(a_j)|\leq s^{-N}$ we have that 
+\begin{equation}\label{eq:totalVarianceOfFirstTerm}
+    \begin{split}
+        \bigvee_{g([b_{i-1},b_i])}\left\{ (\phi\circ h_i)|h_i'|\right\} &\leq s^{-N}\bigvee\{\phi\circ h\}\\
+        &+ \sum_{j=0}^{m-1}|(\phi\circ h_i)(a_{j-1})||h''(c_j)|(a_{j}-a_{j-1})
+    \end{split}
+\end{equation}
+Strict monotonicity of $h_i$ shows that $\bigvee_{b_{i-1}}^{b_i}\{\phi\circ h\} = \bigvee \phi$. By a well-known fact for functions of bounded variation, one can write $\phi = \phi_1-\phi_2$ where $\phi_1$ and $\phi_2$ are monotonically increasing functions. Monotonically increasing functions of bounded variations can only have finitely many jump discontinuities, hence they are Riemann integrable. Hence the function $(\phi\circ h_i) |h''|$ is Riemann-integrable. Refining the partition in the second term in \ref{eq:totalVarianceOfFirstTerm} will only increase it. Taking the supremum over all partitions and using continuity of $h''$ we obtain then that
+\begin{equation}\label{eq:unravelingTheTotalVariation}
+    \begin{split}
+        \bigvee_{g([b_{i-1},b_i])}\left\{ (\phi\circ h_i)|h_i'|\right\} \leq s^{-N}\bigvee_{b_{i-1}}^{b_i} \phi + \int_{g([b_{i-1},b_i])}(\phi\circ h_i) |h''| dm \\
+        s^{-N}\bigvee_{b_{i-1}}^{b_i} \phi + K\int_{g([b_{i-1},b_i])}(\phi\circ h_i) |h'| dm =s^{-N}\bigvee_{b_{i-1}}^{b_i} \phi + K\int|h| dm ,
+    \end{split}
+\end{equation}
+where $K=  \max h''/\min h'$. To evaluate the rightmost side in \ref{eq:SplittingTheTotalVariation}, we note that for any $x\in [b_{i-1},b_i]$ that
+\[|\phi(b_{i-1})|+|\phi(b_i)|\leq |\phi(b_{i-1}) -\phi(x)|+|\phi(x)-\phi(b_i)| +2|\phi(x)|.\]
+ Since $\{b_{i-1},x,b_i\}$ is a partition of the interval $[b_{i-1},b_i]$ we obtain that
+ \[|\phi(b_{i-1})|+|\phi(b_i)|\leq \bigvee_{b_{i-1}}^{b_i}\phi + 2d_i,\]
+ where $d_i = \min_{x\in[b_{i-1},b_i]}|\phi(x)|$. We also have the straightforward inequality
+ \[d_i \leq \frac{1}{b}\int_{b_{i-1}}^{b_i}|\phi|dm ,\]
+where $b=\min{i\in\{1,\ldots,l\}}\{b_i-b_{i-1}\}$. We therefore have that
+\[\sum_{i=1}^l(|\phi(b_{i-1})|+|\phi(b_i)|)\leq \bigvee\phi +\frac{2}{b}\int_{b_{i-1}}^{b_i}|\phi|dm.\]
+Inserting both the above formula and \eqref{eq:unravelingTheTotalVariation} in \eqref{eq:FirstStepInCalculatingTheVariation} then gets us \eqref{eq:BoundedVariationOfTransferOperator}, where $c = 2s^{-N}<1$ and $C = K+2/b$.
+\end{proof}
+
+
+This lemma is important in proving some measure-theoretic properties of our random maps system $\mathbf{T}$. 
+\begin{proposition}\label{proposition:ACIPM}
+Consider the random maps system $T$ defined in Section \ref{section:A Reformulation}. Then $T$ has a unique invariant measure which is abolutely continious with respect to the Lebesgue measure $m$. Furthermore, the Radon-Nikodym derivative $\frac{d\mu}{d m}$ has bounded variation and is $\geq c_0$ for some $c_0>0$. 
+\end{proposition} 
+\begin{proof}
+The idea of the proof is to have a closer look at the transfer operator $\mathcal{L}_{\mathbf{T}}$, which we can write as a convex sum of transfer operators of the form $\mathcal{L}_{T}$, where $T\in \{T_{o},T_l,T_r,T_{lr}\}$. We would like to apply formula  \eqref{eq:BoundedVariationOfTransferOperator}. However, $T$ here is an expanding function on the disjoint union $\mathbf{S} = \mathbb{S}^1\cup I_l\cup I_r$, so the formula is not directly applicable to our case. In fact, the argument is very analogous, but full of notational clutter. It is easy to see that explicit formula in \eqref{equation:explicitFormulaForTransferOperator} holds when we replace the interval $[0,x]$ with some interval or arc of the form $[a,b]\subset \mathbb{S}^1$ \footnote{If $[a,b]\subset \mathbb{S}^1$ we mean the anticlockwise arc from $a$ to $b$}. The analysis in Lemma $\ref{lemma:L-Y}$ can be preformed analogously on $\mathbf{S}$, where we partition the circle and intervals separately. Hence we have by this generalisation of \ref{lemma:L-Y} that there exists some $N\in\mathbb{N}$, and constants $c\in (0,1)$ and $C>0$ such that the inequality
+\[\bigvee \left(\mathcal{L}_{\tilde{T}_1\circ\cdots\circ \tilde{T}_n}\right)(\phi)\leq c\bigvee\phi + C||\phi||_1 \]
+holds for all $n\geq N$, for all functions $\phi$ of bounded variation and all $\tilde{T}_1,\ldots,\tilde{T}_N\in \{T_{o},T_l,T_r,T_{lr}\}$. Since $\mathcal{L}^n_{\mathbf{T}}$ is a weighted average of transfer functions of the form $\mathcal{L}_{\tilde{T}_1\circ\cdots\circ \tilde{T}_n}$ we obtain from the above formula that 
+\[\bigvee \mathcal{L}_{\mathbf{T}}^n(\phi)\leq c\bigvee\phi + C||\phi||_1\]
+for all $\phi$ of bounded variation and all $n\geq N$. Since constant functions are bounded, we have in particular that
+\[\sup_{k\geq0}\bigvee \mathcal{L}_{\mathbf{T}}^k(\mathbf{1}) <\infty,\]
+where $\mathbf{1}$ is the characteristic function on $\mathbf{S}$. Consider the sequence 
+\begin{equation}\label{eq:definition of f_n}
+    f_n:= \frac{1}{n}\sum_{k=1}^n \mathcal{L}_{\mathbf{T}}^k(\mathbf{1})    
+\end{equation}
+and note that $\sup_n \bigvee f_n<\infty$ as well. Hence since the transfer operator preserves integrals and hence $L^1$-norms we have by Lemma \ref{theorem:CompactnessOfEmbedding} that the sequence $\left(f_n\right)_{n\in\mathbb{N}}$ contains an $L^1$-convergent subsequence $(f_{n_k})_{k\in\mathbb{N}}$. Let $f\in L_m^1([0,1])$ be it's limit. We claim that the measure $\tilde{\mu}$ defined by
+\[\tilde{\mu}(E) := \int_E fdm \]
+for all Borel sets $E$ is invariant. Indeed, recall the notation in \eqref{eq:FourProbabilities} and denote for the sake of notational simplicity $T_{o},T_l,T_r,T_{lr}$ by $T_0,T_1,T_2,T_3$ respectively. We calculate 
+\begin{equation}\label{eq:ShowingInvariance}
+    \begin{split}
+        \sum_{i=0}^3P(T_i)\tilde{\mu}(T_i^{-1}(E)) &=  \sum_{i=0}^3P(T_i)\int_{T_i^{-1}(E)} fdm\\
+        &=\lim_{k\to\infty}\sum_{i=0}^3P(T_i)\int_{T_i^{-1}(E)} f_{n_k}dm\\
+        &=\lim_{k\to\infty}    \sum_{k=1}^{n_k}\sum_{i=0}^3\frac{P(T_i)}{n_k}\int_{T_i^{-1}(E)}
+ \mathcal{L}_{\mathbf{T}}^k(\mathbf{1}) dm,
+    \end{split}
+\end{equation}
+where \eqref{eq:definition of f_n} was applied. By \eqref{eq:RemarkOnTransferOperator} we note that for any $g\in L^1(\mathbf{S})$ that
+\[ \sum_{i=0}^3\int_{T_i^{-1}E} g P(T_i) dm = \int_{E} g \; d\left(\sum_{i=0}^3P(T_i){T_i}_*m\right)= \int_{E}\mathcal{L}_{\mathbf{T}}(g)dm.\]
+Plugging this into \eqref{eq:ShowingInvariance} we obtain 
+\[\sum_{i=0}^3P(T_i)\tilde{\mu}(T_i^{-1}(E)) =\lim_{k\to\infty}    \sum_{k=1}^{n_k}\frac{1}{n_k}\int_{E}
+ \mathcal{L}_{\mathbf{T}}^{k+1}(\mathbf{1}) dm = \tilde{\mu}(E) ,\]
+ which proves invariance. By Helly's selection theorem (Theorem \ref{theorem:CompactnessOfEmbedding} below) we also have that $f=d\tilde{\mu}/dm$ is of bounded variation. We define the probability measure we want by $\mu = \tilde{\mu}/\tilde{\mu}(\mathbf{S})$, which of course also has the aforementioned two properties. To prove uniqueness, let 
+ \[\mu'(E) = \int_E f' dm\]
+ be another probability measure which is absolutely continuous with respect to the Lebesgue measure. We first show that $\mu'$ is an ergodic measure with respect to $\mathbf{T}$. Let $E\subset \mathbf{S}$ be an invariant subset with $\mu'(E)>0$. In particular $m(E)>0$.We repeatedly apply Lemma \ref{lemma:MeasuresUnderMaps}. Recall that by  \eqref{equation:HalfOfOmega} we have that $(T_{o})(I_l\cup I_r)\subset \mathbf{S}^1$.  By taking images under $T_{o}$ we find that $\mu'(E\cap \mathbf{S}^1)>0$ and hence 
+ \[m(E\cap \mathbf{S}^1)>0.\]
+ We also note that since $\tau$ is a $C^2$-expanding circle map, it is topologically conjugate to the map \[\mathbb{S}\to\mathbb{S}:x\mapsto kx \text{ mod 1 }\] for some $k$. The unique invariant ergodic measure for that map is the Lebesgue measure. Hence there is some measure $\nu$ on $\mathbb{S}^1$ such that $\tau$ is invariant, ergodic with respect to $\tau$ and such that $\nu$ is absolutely continuous with respect to $m$. By further iterating $T_{o}$ we thus obtain that 
+ \[\mathbb{S}^1\subset E\]
+ modulo sets of zero measure. Since $I_l\subset T_l(\mathbb{S}^1)$ and $I_r\subset T_r(\mathbb{S}^1)$ we conclude that $E$ has full $m$-measure.
+ 
+ We have hence proved that $\mu'$ is ergodic with respect to the $\mathbf{T}$. We conclude that $\mu' = \mu$ based on Lemma \ref{lemma:ConversionToDeterminism} and the fact that for deterministic dynamical systems, invariant ergodic measures are mutually singular. 
+ 
+We finally prove that $d\mu/dm = f$ is uniformly bounded away from $0$. Since $f>0$ $m$-almost everywhere and is of bounded variation, there exists a closed interval $J\subset \mathbb{S}^1$ for which $\rstr{f}{J}>c>0$ for some constant $c>0$. A straightforward corollary of Lemma \ref{lemma:MeasuresUnderMaps} is that for any $T\in\mathcal{T}$ we have that $\rstr{f}{T(J)}>c'>0$ for some $c'>0$. Hence it suffices to prove that there exists a sequence of maps $T_0,\ldots,T_n$ for which  $(T_0\circ\cdots\circ T_n)(J) = \mathbb{S}^1$. However for $k$ large enough we have that $T_{o}^k(J) = S^1$, and that $T_l(T_r(T_{o}(J))) = \mathbf{S}$, hence proving that $f$ is uniformly bounded away from $0$. This is the final lemma that had to be proven.
+\end{proof}
+
+This Lemma, which is Theorem 1 in [Kobre \& Young] is the version of the law of large numbers for the random maps system $\mathbf{T}$.
+\begin{theorem}\label{MainTheorem}
+Remember the original model in Subsection \ref{subsection:Toy Model} and recall that $X_n$ represents the location of a particle along the lattice $\mathbb{Z}$. There exists some constant $\alpha\in \mathbb{R}$ for which the following hold.
+
+
+(1)Assume $X_0 = n$ for some natural number $n\in\mathbb{N}$. For $m$-almost all $x \in\mathbb{S}^1$ and $X_0=0$,
+\[\frac{1}{n}X_n \to \alpha\]
+almost surely as $n\to\infty$.
+
+
+(2) If we assume that $X_0$ and $Y_0$ are not fixed but are random variables such that 
+\[E[|X_0|] <\infty,\]
+and $Y_0$ has a density, then $E[\frac{1}{n}X_n]\to \alpha$
+as $n\to\infty$.
+\end{theorem}
+\begin{proof}
+To prove (1), we assume without loss of generality that $X_0 = 0$. We apply Theorem \ref{theorem:ErgodicTheorem} to the random maps system $\mathbf{T}$, the measure $\mu$ in Proposition \ref{proposition:ACIPM} and the function $g = \chi_{I_r}-\chi_{I_l}$. Here $\chi_{I_r}$ and $\chi_{I_r}$ are the characteristic functions on $I_r$ and $I_l$ respectively. Hence we have for $P^\mathbb{N}$ almost all sequences $(T_i)_{i\in\mathbb{Z}^+}$ that 
+\[\lim_{n\to\infty} \frac{1}{n}\sum_{k=0}^n g( T^{(k)}(x)) = \mu(I_l)-\mu(I_r)\]
+The quantity $\sum_{k=0}^n g( T^{(k)}(x))$ is the number of times between one and $n$ for which $T^{(k)}(x)\in I_r$, minus the number of times at which $T^{(k)}(x)\in I_r$. As we saw in Subsection \ref{section:A Reformulation}, this quantity is exactly equal to $X_n$. The above equation then proves (1) for $\alpha = \mu(I_l)-\mu(I_r)$.
+
+To show (2), we integrate (1) over $\mathbf{S}$ with respect to the law on $Y_0$. Since $Y$ has a density, we are guaranteed integrability. 
+\end{proof}
+
+\subsection{Helly's selection theorem}
+
+\begin{theorem}[Helly's selection theorem]\label{theorem:CompactnessOfEmbedding}
+Let $B\subset L^1_m(\mathbf{S})$ satisfy 
+\[\sup_{f\in B} \bigvee f <\infty\text{ and } \sup_{f\in B} ||f||_1 \leq \infty,\]
+then $B$ is relatively compact in $L^1_m(\mathbf{S})$ and \[\sup_{f\in B}\sup_{y\in\mathbf{S}}|f(y)|< \infty.\] Furthermore any sequence in $(f_n) \subset B$ admits a pointwise-converging subsequence to a function $f$ with $\bigvee f \leq \sup_{n\in\mathbb{N}} \bigvee f_n$.
+\end{theorem}
+\begin{proof}
+Assume without loss of generality that 
+\[\sup_{f\in B} \bigvee f<1\text{ and }\sup_{f\in B} ||f||_1 <1.\] 
+We prove that $B$ is totally bounded. We claim that \[\sup_{y\in\mathbf{S}}|f(y)| < 1+ \frac{2}{\min\{m(I_l),m(I_r)\}}\] 
+for any $f\in B$. Indeed, assume by contradiction that a point $x$ in $\mathbb{S}^1, I_l$ or $I_r$ satisfies \[f(x)\geq 1+ \frac{2}{\min\{m(I_l),m(I_r)\}} ,\] then by our assumption on the total variation we have that \[f\geq \frac{2}{\min\{m(I_l),m(I_r)\}}\] on $\mathbb{S}^1, I_l$ or $I_r$ respectively. This then implies that $||f||_1\geq 2$, which contradicts our assumption on $S$. Hence our claim holds. In fact by a rescaling of the argument above we obtain that for any function $f:\mathbf{S}\to\mathbb{R}$ of bounded variation that 
+\[||f||_\infty \leq\frac{2}{\min\{m(I_l),m(I_r)\}}\left(\bigvee f + ||f||_1\right).\]
+
+Discontinuities in a function $f$ of bounded variation can only consist of either jump-type discontinuities or removable discontinuity. The former is where left and right limits\footnote{For points on $\mathbb{S}^1$ we mean anticlockwise and clockwise respectively} exist but are distinct, and the latter is when the discontinuity at $x\in\mathbf{S}$ can be removed by changing the value of $f(x)$. %Since functions in $L^1_m(\mathbf{S})$ are actually equivalence classes of functions modulo changes in sets of measure zero. We may therefore assume without loss of generality that the functions in $B$ contain no removable singularities. We may also assume that all functions in $B$ are right-continuous. This choice uniquely determines the equivalence class of a function of bounded variation.
+
+We now prove that sequences in $B$ have pointwise converging subsequences. Let $\{x_i\}_{i\in\mathbb{N}}$ be an enumeration of a dense countable subset of $\mathbf{S}$ containing the endpoints of $I_l$ and $I_r$. Let $(f_n)_{n\in\mathbb{N}}\subset B$. Since \[\sup_n ||f_n||_\infty<\infty\] there exists a subsequence $(f_{n_k'})_{k\in\mathbb{N}}$ such that $(f_{n_k'}(x_1))_{k}$ is a Cauchy sequence. We may of course pass to another $(f_{n_k''})_{k\in\mathbb{N}}$ to ensure that $(f_{n_k''}(x_2))_{k}$ is Cauchy as well. We can inductively repeat the procedure for each $x_i$ and obtain by a diagonal argument a subsequence $(f_{n_k})_{k\in\mathbb{N}}$ of the original sequence for which the sequence 
+\[(f_{n_k}(x_i))_k \]
+is Cauchy for all $i$. To prove the lemma it suffices to prove that $(f_{n_k})_{k\in\mathbb{N}}$ is Cauchy in $L^1$ as well.
+
+The argument is a bit technical, but the idea is that since the total variation is bounded, that the set of points where each $f_{n_k}$ differs widely in a small neighbourhood is small. Hence convergence in a dense set of points will cause $(f_{n_k})_k$ to converge in most points. 
+
+
+Assume without loss of generality that $(f_{n_k})_{k\in\mathbb{N}} = (f_k)_{k\in\mathbb{N}}$.
+Let $\mathcal{D}$ be the set of points $y\in\mathbb{S}$ for which $(f_n(y))_n$ is not a Cauchy sequence. We claim that this set is countable. Assume by contradiction that this isn't the case. Define for $\epsilon>0$ and $n,m\in \mathbb{N}$ the set
+\[\mathcal{D}_{\epsilon,n,m} = \{y\in\mathcal{D}:|f_n(y)- f_m(y)|\geq\epsilon\}.\]
+Note that
+\[\bigcup_{k=0}^\infty\bigcap_{N}^\infty\bigcup_{n,m\geq N }\mathcal{D}_{1/k,n,m}=\mathcal{D}\]
+and hence there must be some value of $k$ for which $\bigcap_{N}^\infty\bigcup_{n,m\geq N }\mathcal{D}_{1/k,n,m}$ is uncountable. Let us consider some small number $\delta >0$, the value of which we will later specify.
+
+ %Let $x\in \mathbf{S}$ and let $(a_n)_n,(b_n)_n\subset \{x_i\}_{i\in\mathbb{N}}$ converge monotonously to $x$ from the left and right respectively. Define the set $\mathcal{D}$ to be the set for which $(f_n(x))$ is not a cauchy sequence.
+Choose a finite $\delta$-dense subset $\Lambda_\delta\subset \{x_i\}_{i\in\mathbb{N}}$. We can use $\Lambda_\delta$ to partition $\mathbf{S}$ into a finite number of intervals \[J_i = [a_i,b_i], \text{ where } a_i,b_i\in \Lambda \text{ and } i=1,\ldots,M_\delta\]  
+such that the intervals have mutually disjoint interiors. In particular, we choose $\delta$ and $\Lambda_\delta$ such that $\delta <1$ and 
+\[\#\left\{i: J_i\cap \left(\bigcap_{N}^\infty\bigcup_{n,m\geq N }\mathcal{D}_{1/k,n,m}\right)\neq 0\right\}\geq 100k.\]
+Use the Cauchy property to find an $N_\delta\in \mathbb{N}$ such that
+\begin{equation}\label{eq:UsingEpsilonDensity}
+    |f_n(x)-f_m(x)|<\frac{\delta}{M_\delta}\text{ for all } x\in \Lambda_\delta\text{ and } n,m\geq N_\delta .
+\end{equation}
+We note that there exists $n,m\geq N_\delta$ for which $\mathcal{D}_{1/k,n,m}$ is uncountable. By the assumption on $\Lambda_\delta$ we then have that 
+\begin{equation}\label{eq:UncountabilityIsHighSup}
+    \sum_{i=1}^{M_\delta}\sup_{y\in J_i}|f_n(y)-f_m(y)|\geq 100
+\end{equation}
+
+ We will attempt to quantify how much $f_n$ varies in each interval $J_i$. For any $k\in\mathbb{N}$ we have that
+\[\sup_{y\in J_i}|f_k(y)-f_k(a_i)| \leq \frac{\delta}{M_\delta} +|f_k(c_i)-f_k(a_i)|,\]
+for an appropriately chosen $c_i\in J_i$. By summing up these errors we obtain 
+\begin{equation}\label{eq:SumOverDifferences}
+    \sum_{i=1}^{M_\delta}\sup_{y\in J_i}|f_k(y)-f_k(a_i)|\leq \delta +\sum_{i=1}^{M_\delta} |f_k(c_i)-f_k(a_i)|\leq 1+\delta,
+\end{equation}
+where the last inequality is because the total bounded variation is less than unity. Using \eqref{eq:UsingEpsilonDensity} we obtain for all $n,m\geq N_\delta$ that
+\begin{equation*}
+\begin{split}
+        \sup_{y\in J_i}|f_n(y)-f_m(y)|\leq \\
+    \sup_{y\in J_i}|f_m(y)-f_m(a_i)|+|f_m(a_i)-f_n(a_i)|+\sup_{y\in J_i}|f_m(y)-f_m(a_i)|.
+\end{split}
+    \end{equation*}
+The middle term satisfies $|f_m(a_i)-f_n(a_i)|\leq \delta/M_\delta$, so by summing over the intervals in the partition and using \eqref{eq:SumOverDifferences} we obtain
+\[\sum_{i=1}^{M_\delta}\sup_{y\in J_i}|f_n(y)-f_m(y)|\leq 2+3\delta\]
+for all $n,m\geq N_\delta$, contradicting \eqref{eq:UncountabilityIsHighSup}. Hence there are only a countable number of points $y\in\mathbb{S}$ for which $(f_n(y))_n$ is not a Cauchy sequence. However, since $(f_n(y))_n$ is bounded for all $y$, we can peform another diagonal argument as in the beginning of this proof such that a subsequence $(f_{n_k}(y))_k$ is Cauchy for all $y\in\mathbf{S}$. Denote the function 
+\[f(y) = \lim_{n_k\to\infty} f_{n_k}(y).\]
+By the Lebesgue dominated convergence theorem we have that $f_{n_k}\to f$ in  $L^1_m(\mathbf{S})$ as $n\to \infty$, which proves that $B$ is relatively compact in  $L^1_m(\mathbf{S})$. We prove the final claim about the total variation of $f$. Recall that $\mathbf{S} =I_l\cup \mathbb{S}^1\cup I_r $. For $I_l = (a,b)$ take a partition $a=a_0,\ldots,a_n = b$. Use Fatou's lemma with the counting measure on $\mathbb{N}$ to obtain
+\[\sum_{i=1}^n|f(a_i)-f(a_{i-1})|\leq \limsup \sum_{i=1}^n|f_n(a_i)-f_n(a_{i-1})|.\]
+Summing the analogous inequalities for partitions of $\mathbb{S}^1$ and $I_r$ and taking the supremum over all the partitions proves the final claim and hence the lemma. 
+
+
+
+% We approximate $||f_k||_1$ by denoting 
+% \[\mathcal{I}(f_k) = \sum_{i=1}^M |f(a_i)|m(J_i) ,\] 
+% i.e. by taking the left Riemann sum of $|f_k|$ under the partition. The error in each interval can be estimated as 
+% \[\left|\int_{J_i} |f_k|dm-|f_k(a_i)|m(J_i)\right| \leq m(J_i)\sup_{y\in J_i}|f_k(y)-f_k(a_i)| =  |f_k(c_i)-f_k(a_i)|m(J_i),\]
+% where $c_i\in J_i$ is any point at which the supremum is reached. The existence of such $c_i$ is due to the lack of essential discontinuities in $f_k$ and the fact that $I_k$ is a closed interval. Using this we may estimate the total error made the approximation by
+% \[\big|||f_k||_1-\mathcal{I}(f_k)\big|\leq \sum_{i=1}^M |f_k(c_i)-f_k(a_i)|m(J_i)\leq \delta \sum_{i=1}^M |f_k(c_i)-f_k(a_i)|\]
+% by $\delta$-density of $\Lambda$. Since the total variation of $f_k$ is less than one, we see that the sum on the right hand side above is less than one. Hence for $n,m \geq N$ we have that 
+% \begin{equation}
+% \begin{split}
+%     ||f_n-f_m||_1&\leq ||f_n-\mathcal{I}(f_n)||+\left|\mathcal{I}(f_n)-\mathcal{I}(f_m)\right| +||f_m-\mathcal{I}(f_m)||\\
+%     &\leq \delta +\delta m(\mathbf{S}) +\delta = \delta(2+m(\mathbf{S})),
+% \end{split}    
+% \end{equation}
+% where we used \eqref{eq:UsingEpsilonDensity} for the middle term. Letting $\delta \to 0$ we obtain that the sequence $(f_k)_k$ is a Cauchy sequence in $L^1_m(\mathbf{S})$. Since $L^1$ spaces are complete we further have that the sequence is convergent. Hence we have that $B$ is relatively compact in $L^1_m(\mathbf{S})$. This proves relative compactness of $B$. 
+
+% We now have to show that we can choose this subsequence to converge pointwise. 
+
+
+\end{proof}.
+
+\newpage
+\begin{appendix}
+\section{Sources}
+Kallenberg O. (2002) Markov Processes and Discrete-Time Chains. In: Foundations of Modern Probability. Probability and Its Applications (A Series of the Applied Probability Trust). Springer, New York, NY. \url{https://0-doi-org.pugwash.lib.warwick.ac.uk/10.1007/978-1-4757-4015-8_8}
+\vspace{5mm}
+
+[Kobre \& Young] Kobre, E., Young, LS. Extended Systems with Deterministic Local Dynamics and Random Jumps. Commun. Math. Phys. 275, 709–720 (2007). https://doi.org/10.1007/s00220-007-0312-5
+
+\vspace{5mm}
+[Kifer Y.] Kifer Y. (1986) General analysis of random maps. In: Ergodic Theory of Random Transformations. Progress in Probability and Statistics, vol 10. Birkhäuser Boston. \url{https://doi.org/10.1007/978-1-4684-9175-3_2}
+
+\vspace{5mm}
+[Evans] Evans, L. C. (2010). Partial differential equations. Providence, R.I.: American Mathematical Society. ISBN: 9780821849743 0821849743
+
+\end{appendix}
+\end{document}
